@@ -101,56 +101,68 @@ export const axisFactory = (settings: Settings): AxisFactory => {
     const optional = {};
 
     const _factory: Partial<AxisFactory> = (data): AxisFactoryContent => {
-        const useType = axisType(settings)
-            .excludeType(excludeType)
-            .settingName(settingName)
-            .settingValue(settingValue)();
-
-        const axis = axisTypes[useType];
-        const domainFunction = (axis.domain() as Domain).valueNames(valueNames);
-
-        optionalParams.forEach((p) => {
-            if (optional[p] && domainFunction[p])
-                domainFunction[p](optional[p]);
-        });
-        if (domainFunction.orient) domainFunction.orient(orient);
-
-        let domain = domainFunction(data);
-        if (modifyDomain !== null) {
-            domain = modifyDomain(domain);
-        }
-
-        if (memoValue && typeof domain[0] === "number") {
-            memoValue[0] = domain[0] = Math.min(domain[0], memoValue[0]);
-            memoValue[1] = domain[1] = Math.max(domain[1], memoValue[1]);
-        }
-
-        const component = axis.hasOwnProperty("component")
-            ? createComponent(axis, domain, data)
-            : defaultComponent();
-
-        const tickFormatFunction =
-            axis == linear
-                ? linear.tickFormatFunction(domain[0], domain[1])
-                : undefined;
-
-        return {
-            scale: axis.scale(),
-            domain,
-            domainFunction,
-            labelFunction: axis.labelFunction,
-            component: {
-                bottom: component.bottom,
-                left: component.left,
-                top: component.top,
-                right: component.right,
-            },
-            size: component.size,
-            decorate: component.decorate,
-            label: settings[settingName].map((v) => v.name).join(", "),
-            tickFormatFunction,
-        };
-    };
+		const useType = axisType(settings)
+			.excludeType(excludeType)
+			.settingName(settingName)
+			.settingValue(settingValue)();
+		const axis = axisTypes[useType];
+		const domainFunction = (axis.domain() as Domain).valueNames(valueNames);
+		optionalParams.forEach((p) => {
+			if (optional[p] && domainFunction[p])
+				domainFunction[p](optional[p]);
+		});
+		if (domainFunction.orient) domainFunction.orient(orient);
+		let domain = domainFunction(data);
+		if (modifyDomain !== null) {
+			domain = modifyDomain(domain);
+		}
+		if (memoValue && typeof domain[0] === "number") {
+			memoValue[0] = domain[0] = Math.min(domain[0], memoValue[0]);
+			memoValue[1] = domain[1] = Math.max(domain[1], memoValue[1]);
+		}
+		const component = axis.hasOwnProperty("component")
+			? createComponent(axis, domain, data)
+			: defaultComponent();
+		const tickFormatFunction =
+			axis == linear
+				? linear.tickFormatFunction(domain[0], domain[1])
+				: undefined;
+		
+		// 获取配置
+		const config = settings?.plugin_config;
+		const yAxisConfig = settings?.plugin_config?.y_axis;
+		const labelText = settings[settingName].map((v) => v.name).join(", ");
+		
+		// 根据axis类型和配置决定是否显示label
+		const shouldHideLabel = orient === 'vertical' && yAxisConfig?.hideAxisLabels;
+		
+		console.log('Debug axis label:', {
+			orient,
+			config: config?.y_axis,
+			hideAxisLabels: yAxisConfig?.hideAxisLabels,
+			showMinMaxTicks: yAxisConfig?.showMinMaxTicks,
+			shouldHideLabel,
+			settingName,
+			originalLabel: labelText
+		});
+		
+		return {
+			scale: axis.scale(),
+			domain,
+			domainFunction,
+			labelFunction: axis.labelFunction,
+			component: {
+				bottom: component.bottom,
+				left: component.left,
+				top: component.top,
+				right: component.right,
+			},
+			size: component.size,
+			decorate: component.decorate,
+			label: "",
+			tickFormatFunction,
+		};
+	};
 
     const createComponent = (axis, domain, data) =>
         axis

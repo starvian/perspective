@@ -56,6 +56,7 @@ export interface AxisConfig {
     baseline?: boolean;
     visible?: boolean;
     showMinMaxTicks?: boolean;  
+	hideAxisLabels?: boolean;
     ticks?: {
         display?: string;
         labels?: boolean;

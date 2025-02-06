@@ -165,42 +165,36 @@ export const component = (_settings: Settings): Component => {
     // };
 	
 	const getComponent: any = (): ComponentData => {
-    const components = {
-        bottom: fc.axisBottom,
-        left: (scale) => {
-            const axis = fc.axisLeft(scale);
-            
-            // 获取y轴配置
-            const yAxisConfig = _settings?.plugin_config?.y_axis;
-            
-            // 只有明确设置为 false 时才完全隐藏刻度
-            if (yAxisConfig?.showMinMaxTicks === false) {
-                // 完全隐藏刻度
-                axis.tickSize(0)
-                    .tickFormat(() => '')
-                    .ticks(0);
-            } else {
-                // 默认显示最大值和最小值刻度
-                const domain = scale.domain();
-                axis.tickValues([domain[0], domain[1]])
-                    .tickSize(0)
-                    .tickFormat((d) => d.toFixed(2));
-            }
-            
-            // 添加处理column label的代码
-            //if (yAxisConfig?.hideColumnLabels) {
-                axis.tickFormat(() => '');
-            //}
-            
-            return axis;
-        },
-        top: fc.axisTop,
-        right: fc.axisRight,
-        decorate,
+        const components = {
+            bottom: fc.axisBottom,
+            left: (scale) => {
+                const axis = fc.axisLeft(scale);
+                
+                // 获取y轴配置
+                const yAxisConfig = _settings?.plugin_config?.y_axis;
+                
+                // 只有明确设置为 false 时才完全隐藏刻度
+                if (yAxisConfig?.showMinMaxTicks === false) {
+                    // 完全隐藏刻度
+                    axis.tickSize(0)
+                        .tickFormat(() => '')
+                        .ticks(0);
+                } else {
+                    // 默认显示最大值和最小值刻度
+                    const domain = scale.domain();
+                    axis.tickValues([domain[0], domain[1]])
+                        .tickSize(0)
+                        .tickFormat((d) => d.toFixed(2));
+                }
+                
+                return axis;
+            },
+            top: fc.axisTop,
+            right: fc.axisRight,
+            decorate,
+        };
+        return components;
     };
-    return components;
-};
-
 	
     getComponent.domain = (...args) => {
         if (!args.length) {
