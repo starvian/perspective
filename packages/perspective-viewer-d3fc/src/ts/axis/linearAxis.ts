@@ -138,18 +138,64 @@ export const component = (_settings: Settings): Component => {
         }
     };
 
-    const getComponent: any = (): ComponentData => {
+	// const getComponent: any = (): ComponentData => {
+    //     const components = {
+    //         bottom: fc.axisBottom,
+    //         left: (scale) => {
+    //             const axis = fc.axisLeft(scale);
+                
+    //             // 获取域的范围（最大值和最小值）
+    //             const domain = scale.domain();
+                
+    //             // 自定义刻度生成器，只返回最大值和最小值
+    //             axis.tickValues([domain[0], domain[1]])  // 只显示最大和最小值
+    //                 .tickSize(0)  // 设置刻度线长度为0
+    //                 .tickFormat((d) => {
+    //                     // 使用合适的格式化函数处理数值
+    //                     return d.toFixed(2);  // 保留两位小数，你可以根据需要调整格式
+    //                 });
+                
+    //             return axis;
+    //         },
+    //         top: fc.axisTop,
+    //         right: fc.axisRight,
+    //         decorate,
+    //     };
+    //     return components;
+    // };
+	
+	const getComponent: any = (): ComponentData => {
         const components = {
             bottom: fc.axisBottom,
-            left: fc.axisLeft,
+            left: (scale) => {
+                const axis = fc.axisLeft(scale);
+                
+                // 获取y轴配置
+                const yAxisConfig = _settings?.plugin_config?.y_axis;
+                
+                // 只有明确设置为 false 时才完全隐藏刻度
+                if (yAxisConfig?.showMinMaxTicks === false) {
+                    // 完全隐藏刻度
+                    axis.tickSize(0)
+                        .tickFormat(() => '')
+                        .ticks(0);
+                } else {
+                    // 默认显示最大值和最小值刻度
+                    const domain = scale.domain();
+                    axis.tickValues([domain[0], domain[1]])
+                        .tickSize(0)
+                        .tickFormat((d) => d.toFixed(2));
+                }
+                
+                return axis;
+            },
             top: fc.axisTop,
             right: fc.axisRight,
-            // size: "100px", // works, but can't measure here
             decorate,
         };
         return components;
     };
-
+	
     getComponent.domain = (...args) => {
         if (!args.length) {
             return domain;

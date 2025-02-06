@@ -1,22 +1,8 @@
-// ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-// ┃ ██████ ██████ ██████       █      █      █      █      █ █▄  ▀███ █       ┃
-// ┃ ▄▄▄▄▄█ █▄▄▄▄▄ ▄▄▄▄▄█  ▀▀▀▀▀█▀▀▀▀▀ █ ▀▀▀▀▀█ ████████▌▐███ ███▄  ▀█ █ ▀▀▀▀▀ ┃
-// ┃ █▀▀▀▀▀ █▀▀▀▀▀ █▀██▀▀ ▄▄▄▄▄ █ ▄▄▄▄▄█ ▄▄▄▄▄█ ████████▌▐███ █████▄   █ ▄▄▄▄▄ ┃
-// ┃ █      ██████ █  ▀█▄       █ ██████      █      ███▌▐███ ███████▄ █       ┃
-// ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-// ┃ Copyright (c) 2017, the Perspective Authors.                              ┃
-// ┃ ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌ ┃
-// ┃ This file is part of the Perspective library, distributed under the terms ┃
-// ┃ of the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). ┃
-// ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
 import * as fc from "d3fc";
 import { D3Scale, Orientation } from "../types";
 
 const mainGridSvg = (settings) => (x, xTick) =>
-    x
-        .style("stroke-width", (xTick) => "1.0")
-        .style("stroke", (xTick) => axis_color(xTick, settings));
+    x.style("display", "none");
 
 function axis_color(xTick, settings) {
     if (xTick === 0) {
@@ -33,31 +19,25 @@ function axis_color(xTick, settings) {
 }
 
 const mainGridCanvas = (settings) => (c, xTick) => {
-    c.strokeStyle = axis_color(xTick, settings);
-    c.lineWidth = 1;
+    // Do nothing to hide gridlines
 };
 
 const crossGridSvg = (x, _) => x.style("display", "none");
+
 const crossGridCanvas = (settings) => (c, xTick) => {
-    c.lineWidth = 1;
-    c.strokeStyle = axis_color(xTick, settings);
+    // Do nothing to hide gridlines
 };
 
 export interface WithGridLines {
     (...args): any;
-
     orient(): Orientation;
     orient(nextOrient: Orientation): WithGridLines;
-
     canvas(): boolean;
     canvas(nextCanvas: boolean): WithGridLines;
-
     xScale(): D3Scale;
     xScale(xScale: D3Scale): WithGridLines;
-
     yScale(): D3Scale;
     yScale(yScale: D3Scale): WithGridLines;
-
     context(): any;
     context(context: any): WithGridLines;
 }
@@ -68,7 +48,6 @@ export default (series, settings): WithGridLines => {
     let xScale = null;
     let yScale = null;
     let context = null;
-
     let seriesMulti = fc.seriesSvgMulti();
     let annotationGridline = fc.annotationSvgGridline();
     let mainGrid = mainGridSvg(settings);
@@ -84,12 +63,10 @@ export default (series, settings): WithGridLines => {
 
         const multi = seriesMulti.xScale(xScale).yScale(yScale);
 
-        const xStyle = orient === "vertical" ? crossGrid : mainGrid;
-        const yStyle = orient === "horizontal" ? crossGrid : mainGrid;
-
+        // Apply cross grid (which hides lines) to both x and y
         const gridlines = annotationGridline
-            .xDecorate(xStyle)
-            .yDecorate(yStyle);
+            .xDecorate(crossGrid)
+            .yDecorate(crossGrid);
 
         return multi.series([gridlines, series])(...args);
     };

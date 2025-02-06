@@ -424,7 +424,7 @@ export function register(...plugin_names: string[]) {
                                 type: get_pivot_column_type(r),
                             })),
                             mainValues: columns.map((a) => ({
-                                name: a,
+                                name: ' ',
                                 type: view_schema[a],
                             })),
                             splitValues: split_by.map((r) => ({

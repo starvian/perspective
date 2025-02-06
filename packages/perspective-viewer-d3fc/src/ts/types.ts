@@ -48,6 +48,36 @@ export interface Chart {
     column_style_controls?: (type: Type, group?: string) => unknown;
 }
 
+export interface AxisConfig {
+    type?: string;
+    label?: string;
+    domain?: [number, number];
+    gridlines?: boolean;
+    baseline?: boolean;
+    visible?: boolean;
+    showMinMaxTicks?: boolean;  
+    ticks?: {
+        display?: string;
+        labels?: boolean;
+        size?: number;
+    };
+}
+
+export interface PluginConfig {
+    zoom?: boolean;
+    legend?: boolean;
+    show_grid?: boolean;
+    grid?: {
+        visible?: boolean;
+        y?: {
+            visible?: boolean;
+            style?: string;
+        };
+    };
+    x_axis?: AxisConfig;
+    y_axis?: AxisConfig;
+}
+
 export type PadUnit = "percent" | "domain";
 export type Pad = [number, number];
 
@@ -111,6 +141,7 @@ export type Settings = {
     sunburstLevel?: any;
     columns_config?: ColumnConfigValues;
     treemaps?: Record<string, TreemapValue>;
+	plugin_config?: PluginConfig; 
 };
 
 export type Orientation = "vertical" | "horizontal" | "both";
